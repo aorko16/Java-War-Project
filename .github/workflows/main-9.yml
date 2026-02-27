@@ -1,4 +1,4 @@
-name: Java WAR CI/CD--V1
+name: Java WAR CI/CD
 
 on:
   push:
@@ -62,8 +62,22 @@ jobs:
         run: |
           WAR_FILE=$(find artifact -name "*.war")
           echo "Deploying $WAR_FILE"
-          sudo cp $WAR_FILE /opt/tomcat/webapps/
-          sudo systemctl restart tomcat
+
+          # Stop Tomcat safely
+          /opt/tomcat/bin/shutdown.sh || true
+          sleep 5
+
+          # Remove old deployment
+          rm -rf /opt/tomcat/webapps/hello-world*
+          
+          # Copy new WAR
+          cp $WAR_FILE /opt/tomcat/webapps/
+
+          # Start Tomcat
+          /opt/tomcat/bin/startup.sh
+          sleep 5
+
+          echo "Tomcat restarted successfully 🚀"
 
       - name: Deployment Success
-        run: echo "Deployment Completed Successfully 🚀"
+        run: echo "Deployment Completed Successfully ✅"
