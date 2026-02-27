@@ -39,10 +39,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: java-build
-          path: ./artifact
 
       - name: Deploy to Tomcat
         run: |
           sudo cp *.war /opt/tomcat/webapps/
           sudo systemctl restart tomcat
+
 
