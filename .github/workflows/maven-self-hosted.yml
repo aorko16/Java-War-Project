@@ -1,17 +1,14 @@
-
-name: Java CI with Maven self-hosted runner
+name: Making Artifact Jar- War
 
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
 
 jobs:
-  build:
-
+  build-pipe:
+    name: compile project
     runs-on: ubuntu-latest
-
+    
     steps:
     - uses: actions/checkout@v4
     - name: Set up JDK 17
@@ -21,5 +18,11 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      run: mvn -B package --file pom.xml
-
+      run: |
+       mvn compile 
+       mvn test
+       mvn package
+    - uses: actions/upload-artifact@v4
+      with:
+       name: action-java-1    # application name
+       path: target/*war 
