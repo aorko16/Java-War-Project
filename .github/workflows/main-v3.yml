@@ -1,0 +1,29 @@
+name: Making Artifact Jar- War-Basic-v3
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-pipe:
+    name: compile project
+    runs-on: self-hosted
+    
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    - name: Build with Maven
+      run: |
+       mvn compile 
+       mvn test
+       mvn package
+    - uses: actions/upload-artifact@v4
+      with:
+       name: action-java-22    # application name
+       path: target/*war 
+
