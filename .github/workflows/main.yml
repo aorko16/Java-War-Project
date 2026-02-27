@@ -20,11 +20,13 @@ jobs:
         cache: maven
 
     - name: Build + SonarQube Analysis
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_TEST }}
       run: |
         mvn clean verify sonar:sonar \
         -Dsonar.projectKey=java-demo-1 \
-        -Dsonar.host.url=http://13.233.144.142:9000/
-        -Dsonar.login=${{ secrets.SONAR_TOKEN_TEST }}
+        -Dsonar.host.url=http://13.233.144.142:9000 \
+        -Dsonar.login=$SONAR_TOKEN
 
     - uses: actions/upload-artifact@v4
       with:
