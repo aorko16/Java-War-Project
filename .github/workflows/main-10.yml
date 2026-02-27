@@ -1,0 +1,51 @@
+name: Java WAR CI/CD-Aorko-10
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  build:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 11
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build Project
+        run: mvn clean package
+
+      - name: Upload WAR Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: war-file
+          path: target/*.war
+
+  deploy:
+    runs-on: self-hosted
+    needs: build
+
+    steps:
+      - name: Download WAR Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: war-file
+          path: ./artifact
+
+      - name: Deploy WAR to Tomcat
+        run: |
+          WAR_FILE=$(find artifact -name "*.war")
+          echo "Deploying $WAR_FILE"
+
+          sudo cp $WAR_FILE /opt/tomcat/webapps/
+          sudo systemctl restart tomcat
+          echo "Deployment Completed Successfully 🚀"
