@@ -1,0 +1,61 @@
+name: Runner self-hosted-deploy--111111     
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  # COMPILE JOB
+  # ===============================
+  compile:
+    name: Compile Code
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+      - name: Compile Source Code
+        run: mvn compile
+
+  #  TEST JOB
+  # ===============================
+  test:
+    name: Run Tests
+    runs-on: self-hosted
+    needs: compile
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+      - name: Run Unit Tests
+        run: mvn test
+
+  # BUILD JOB
+  # ===============================
+  build:
+    name: Build WAR File
+    runs-on: self-hosted
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build WAR
+        run: mvn clean package
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-build
+          path: target/*.war
